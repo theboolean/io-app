@@ -11,9 +11,11 @@ import {
   bpdEnrollUserToProgram
 } from "../store/actions/onboarding";
 import { getAsyncResult } from "../../../../utils/saga";
+import { CitizenResource } from "../../../../../definitions/bpd/citizen/CitizenResource";
 import { putEnrollCitizen, getCitizen } from "./networking";
 import { handleBpdEnroll } from "./orchestration/onboarding/enrollToBpd";
 import { handleBpdStartOnboardingSaga } from "./orchestration/onboarding/startOnboarding";
+import { Either } from "fp-ts/lib/Either";
 
 // watch all events about bpd
 export function* watchBonusBpdSaga(bpdBearerToken: string): SagaIterator {
@@ -42,8 +44,12 @@ export function* watchBonusBpdSaga(bpdBearerToken: string): SagaIterator {
 
 // try to enroll the citizen and return the operation outcome
 // true -> successfully enrolled
-export function* enrollCitizen(): Generator<CallEffect, boolean, boolean> {
+export function* enrollCitizen(): Generator<
+  CallEffect,
+  Either<Error, CitizenResource>,
+  Either<Error, CitizenResource>
+> {
   return yield call(() =>
-    getAsyncResult(bpdEnrollUserToProgram, undefined as void, c => c.enabled)
+    getAsyncResult(bpdEnrollUserToProgram, undefined as void)
   );
 }
