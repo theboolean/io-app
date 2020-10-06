@@ -7,6 +7,7 @@
 import { RptIdFromString } from "italia-pagopa-commons/lib/pagopa";
 import { getType } from "typesafe-actions";
 
+import * as t from "io-ts";
 import { clearCache } from "../../actions/profile";
 import { Action } from "../../actions/types";
 import { paymentCompletedSuccess } from "../../actions/wallet/payment";
@@ -53,7 +54,11 @@ export const paymentByRptIdReducer = (
       };
 
     case getType(clearCache):
-      return INITIAL_STATE;
+      // reset data if payload is not defined or if explicit is true
+      return t.boolean.decode(action.payload).fold(
+        _ => INITIAL_STATE,
+        explicit => (explicit ? INITIAL_STATE : state)
+      );
 
     default:
       return state;

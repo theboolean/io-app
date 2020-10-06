@@ -45,8 +45,8 @@ export const acknowledgeOnEmailValidation = createStandardAction(
 )<Option<boolean>>();
 
 export const profileFirstLogin = createStandardAction("PROFILE_FIRST_LOGIN")();
-
-export const clearCache = createStandardAction("CLEAR_CACHE")();
+// true means explicit
+export const clearCache = createStandardAction("CLEAR_CACHE")<void | boolean>();
 
 export type ProfileActions =
   | ActionType<typeof resetProfileState>

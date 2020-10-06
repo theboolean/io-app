@@ -12,7 +12,8 @@ export function* watchSessionExpiredSaga(): IterableIterator<Effect> {
   yield takeLatest(getType(sessionExpired), function* () {
     // delete saved pin
     yield call(deletePin);
-    yield put(clearCache());
+    // clear cache is not explicit
+    yield put(clearCache(false));
     // start again the application
     yield put(startApplicationInitialization());
   });

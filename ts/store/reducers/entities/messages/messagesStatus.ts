@@ -10,6 +10,7 @@ import {
 import { clearCache } from "../../../actions/profile";
 import { Action } from "../../../actions/types";
 import { GlobalState } from "../../types";
+import * as t from "io-ts";
 
 export type MessageStatus = {
   isRead: boolean;
@@ -87,7 +88,11 @@ const reducer = (
         {} as MessagesStatus
       );
     case getType(clearCache):
-      return INITIAL_STATE;
+      // reset data if payload is not defined or if explicit is true
+      return t.boolean.decode(action.payload).fold(
+        _ => INITIAL_STATE,
+        explicit => (explicit ? INITIAL_STATE : state)
+      );
     default:
       return state;
   }
