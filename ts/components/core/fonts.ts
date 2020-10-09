@@ -40,7 +40,7 @@ export enum FontStyle {
   "italic" = "italic"
 }
 
-type FontStyleObject = {
+export type FontStyleObject = {
   fontFamily: string;
   fontWeight?: FontWeightValue;
   fontStyle?: FontStyle;
