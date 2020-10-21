@@ -34,7 +34,6 @@ import {
 import { instabugLog, TypeLogs } from "../../../boot/configureInstabug";
 import { cieAuthenticationError } from "../../../store/actions/cie";
 import { ReduxProps } from "../../../store/actions/types";
-import { isIos } from "../../../utils/platform";
 
 type NavigationParams = {
   ciePin: string;
@@ -361,7 +360,7 @@ class CieCardReaderScreen extends React.PureComponent<Props, State> {
           type={"SingleButton"}
           leftButton={{
             onPress: this.props.navigation.goBack,
-            bordered: true,
+            cancel: true,
             title: I18n.t("global.buttons.cancel")
           }}
         />
@@ -370,8 +369,8 @@ class CieCardReaderScreen extends React.PureComponent<Props, State> {
         <FooterWithButtons
           type={"TwoButtonsInlineThird"}
           leftButton={{
-            bordered: true,
             onPress: this.props.navigation.goBack,
+            cancel: true,
             title: I18n.t("global.buttons.cancel")
           }}
           rightButton={{
@@ -394,10 +393,10 @@ class CieCardReaderScreen extends React.PureComponent<Props, State> {
           <Text style={styles.padded} ref={this.subTitleRef}>
             {this.state.subtitle}
           </Text>
-          {!isIos && (
+          {Platform.OS === "android" && (
             <CieReadingCardAnimation readingState={this.state.readingState} />
           )}
-          {isIos && <View spacer={true} />}
+          {Platform.OS === "ios" && <View spacer={true} />}
           <Text style={styles.padded} accessible={true}>
             {this.state.content}
           </Text>

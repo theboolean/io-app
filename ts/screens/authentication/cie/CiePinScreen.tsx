@@ -1,5 +1,5 @@
 import { Millisecond } from "italia-ts-commons/lib/units";
-import { View } from "native-base";
+import { View, Text } from "native-base";
 import * as React from "react";
 import {
   Keyboard,
@@ -28,7 +28,6 @@ import { Dispatch, ReduxProps } from "../../../store/actions/types";
 import variables from "../../../theme/variables";
 import { setAccessibilityFocus } from "../../../utils/accessibility";
 import Markdown from "../../../components/ui/Markdown";
-import { isIos } from "../../../utils/platform";
 
 type Props = ReduxProps &
   ReturnType<typeof mapDispatchToProps> &
@@ -59,13 +58,6 @@ class CiePinScreen extends React.PureComponent<Props, State> {
     super(props);
     this.state = { pin: "" };
   }
-
-  private getContextualHelp = () => ({
-    title: I18n.t("authentication.cie.pin.contextualHelpTitle"),
-    body: () => (
-      <Markdown>{I18n.t("authentication.cie.pin.contextualHelpBody")}</Markdown>
-    )
-  });
 
   private onProceedToCardReaderScreen = (url: string) => {
     const ciePin = this.state.pin;
@@ -117,7 +109,14 @@ class CiePinScreen extends React.PureComponent<Props, State> {
           setAccessibilityFocus(this.pinPadViewRef, 100 as Millisecond);
         }}
         goBack={true}
-        contextualHelp={this.getContextualHelp()}
+        contextualHelp={{
+          title: I18n.t("authentication.cie.pin.contextualHelpTitle"),
+          body: () => (
+            <Markdown>
+              {I18n.t("authentication.cie.pin.contextualHelpBody")}
+            </Markdown>
+          )
+        }}
         headerTitle={I18n.t("authentication.cie.pin.pinCardHeader")}
       >
         <ScrollView>
@@ -134,17 +133,10 @@ class CiePinScreen extends React.PureComponent<Props, State> {
             <CiePinpad
               pin={this.state.pin}
               pinLength={CIE_PIN_LENGTH}
+              description={I18n.t("authentication.cie.pin.pinCardContent")}
               onPinChanged={this.handelOnPinChanged}
               onSubmit={this.showModal}
             />
-            <View spacer={true} />
-            {isIos && (
-              <AdviceComponent
-                iconName={"io-bug"}
-                text={I18n.t("global.disclaimer_beta")}
-                iconColor={"black"}
-              />
-            )}
             <View spacer={true} />
             <AdviceComponent
               text={I18n.t("login.expiration_info")}
