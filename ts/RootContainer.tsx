@@ -14,8 +14,7 @@ import configurePushNotifications from "./boot/configurePushNotification";
 import FlagSecureComponent from "./components/FlagSecure";
 import { LightModalRoot } from "./components/ui/LightModal";
 import VersionInfoOverlay from "./components/VersionInfoOverlay";
-import { bpdTestOverlay, shouldDisplayVersionInfoOverlay } from "./config";
-import { BpdTestOverlay } from "./features/bonus/bpd/components/BpdTestOverlay";
+import { shouldDisplayVersionInfoOverlay } from "./config";
 import Navigation from "./navigation";
 import {
   applicationChangeState,
@@ -140,7 +139,6 @@ class RootContainer extends React.PureComponent<Props> {
         {Platform.OS === "android" && <FlagSecureComponent />}
         <Navigation />
         {shouldDisplayVersionInfoOverlay && <VersionInfoOverlay />}
-        {bpdTestOverlay && <BpdTestOverlay />}
         <RootModal />
         <LightModalRoot />
       </Root>

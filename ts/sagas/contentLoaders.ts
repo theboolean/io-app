@@ -123,16 +123,14 @@ function* watchServiceMetadataLoadSaga(
             : pot.some(undefined);
         yield put(loadServiceMetadata.success({ serviceId, data }));
       } else {
-        throw Error(`[${serviceId}] response status ${response.value.status}`);
+        throw Error(`response status ${response.value.status}`);
       }
     }
   } catch (e) {
     yield put(
       loadServiceMetadata.failure({
         serviceId,
-        error: e
-          ? new Error(`[${serviceId}] ${typeof e === "string" ? e : e.message}`)
-          : Error(`[${serviceId}] Unable to load metadata for service`)
+        error: e || Error(`Unable to load metadata for service ${serviceId}`)
       })
     );
   }
