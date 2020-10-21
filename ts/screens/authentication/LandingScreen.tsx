@@ -44,9 +44,8 @@ import { GlobalState } from "../../store/reducers/types";
 import variables from "../../theme/variables";
 import { ComponentProps } from "../../types/react";
 import { isDevEnv } from "../../utils/environment";
+import { showToast } from "../../utils/showToast";
 import RootedDeviceModal from "../modal/RootedDeviceModal";
-import { InfoScreenComponent } from "../../components/infoScreen/InfoScreenComponent";
-import { renderInfoRasterImage } from "../../components/infoScreen/imageRendering";
 
 type Props = NavigationInjectedProps &
   LightModalContextInterface &
@@ -55,7 +54,6 @@ type Props = NavigationInjectedProps &
 
 type State = {
   isRootedOrJailbroken: Option<boolean>;
-  isSessionExpired: boolean;
 };
 
 const getCards = (
@@ -129,12 +127,10 @@ const IdpCIE: IdentityProvider = {
   profileUrl: ""
 };
 
-const sessionExpiredImg = require("../../../img/landing/session_expired.png");
-
 class LandingScreen extends React.PureComponent<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = { isRootedOrJailbroken: none, isSessionExpired: false };
+    this.state = { isRootedOrJailbroken: none };
   }
 
   private isCieSupported = () => {
@@ -150,8 +146,20 @@ class LandingScreen extends React.PureComponent<Props, State> {
     const isRootedOrJailbroken = await JailMonkey.isJailBroken();
     this.setState({ isRootedOrJailbroken: some(isRootedOrJailbroken) });
     if (this.props.isSessionExpired) {
-      this.setState({ isSessionExpired: true });
+      showToast(
+        I18n.t("authentication.expiredSessionBanner.message"),
+        "warning",
+        "top"
+      );
       this.props.resetState();
+    }
+
+    if (this.props.isSessionExpired) {
+      showToast(
+        I18n.t("authentication.expiredSessionBanner.message"),
+        "warning",
+        "top"
+      );
     }
   }
 
@@ -231,17 +239,9 @@ class LandingScreen extends React.PureComponent<Props, State> {
       >
         {isDevEnv && <DevScreenButton onPress={this.navigateToMarkdown} />}
 
-        {this.state.isSessionExpired ? (
-          <InfoScreenComponent
-            title={I18n.t("authentication.landing.session_expired.title")}
-            body={I18n.t("authentication.landing.session_expired.body")}
-            image={renderInfoRasterImage(sessionExpiredImg)}
-          />
-        ) : (
-          <Content contentContainerStyle={styles.flex} noPadded={true}>
-            <HorizontalScroll cards={this.renderCardComponents()} />
-          </Content>
-        )}
+        <Content contentContainerStyle={styles.flex} noPadded={true}>
+          <HorizontalScroll cards={this.renderCardComponents()} />
+        </Content>
 
         <View footer={true}>
           <ButtonDefaultOpacity
