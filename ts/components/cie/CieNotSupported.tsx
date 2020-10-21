@@ -26,7 +26,6 @@ const CieNotSupported: React.FunctionComponent<Props> = props => {
       <Markdown onLoadEnd={handleMarkdownLoaded}>
         {I18n.t("authentication.landing.cie_unsupported.body")}
       </Markdown>
-
       {Platform.OS === "android" && (
         <React.Fragment>
           <View spacer={true} />
