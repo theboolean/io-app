@@ -12,7 +12,6 @@ import {
   NavigationState
 } from "react-navigation";
 import { connect } from "react-redux";
-import { View } from "native-base";
 import LoadingSpinnerOverlay from "../../../components/LoadingSpinnerOverlay";
 import GenericErrorComponent from "../../../components/screens/GenericErrorComponent";
 import TopScreenComponent from "../../../components/screens/TopScreenComponent";
@@ -25,6 +24,7 @@ import { resetToAuthenticationRoute } from "../../../store/actions/navigation";
 import { Dispatch } from "../../../store/actions/types";
 import { SessionToken } from "../../../types/SessionToken";
 import { onLoginUriChanged } from "../../../utils/login";
+import { View } from "native-base";
 
 type NavigationParams = {
   cieConsentUri: string;
