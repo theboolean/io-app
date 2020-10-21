@@ -45,8 +45,6 @@ const injectJs = `
   true;
 `;
 
-// this is a 'fake' user-agent to send through the webView when the running device is an iOS
-// this is needed because the device must be recognized as Android
 const iOSUserAgent =
   "Mozilla/5.0 (Linux; Android 10; MI 9) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.162 Mobile Safari/537.36";
 const userAgent = Platform.select({ ios: iOSUserAgent, default: undefined });
@@ -146,7 +144,7 @@ export default class CieRequestAuthenticationOverlay extends React.PureComponent
   private renderWebView() {
     return (
       <View style={styles.flex}>
-        {!this.state.findOpenApp && (
+        {this.state.findOpenApp === false && (
           <WebView
             ref={this.webView}
             userAgent={userAgent}
