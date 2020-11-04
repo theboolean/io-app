@@ -288,6 +288,55 @@ const navigation = createReactNavigationReduxMiddleware(
 
 const navigationHistory = createNavigationHistoryMiddleware();
 
+export function configureStoreAndPersistorInjectable(
+  initState: any,
+  initSaga: () => Generator
+): {
+  store: Store;
+  persistor: Persistor;
+} {
+  /**
+   * If available use redux-devtool version of the compose function that allow
+   * the inspection of the store from the devtool.
+   */
+
+  const composeEnhancers =
+    // eslint-disable-next-line no-underscore-dangle
+    (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+  const middlewares = applyMiddleware(
+    sagaMiddleware,
+    logger,
+    navigationHistory,
+    navigation,
+    analytics.actionTracking, // generic tracker for selected redux actions
+    analytics.screenTracking // tracks screen navigation,
+  );
+  // add Reactotron enhancer if the app is running in dev mode
+
+  const enhancer: StoreEnhancer =
+    RTron && RTron.createEnhancer
+      ? composeEnhancers(middlewares, RTron.createEnhancer())
+      : composeEnhancers(middlewares);
+
+  const store: Store = createStore<
+    PersistedGlobalState,
+    Action,
+    Record<string, unknown>,
+    Record<string, unknown>
+  >(persistedReducer, initState, enhancer);
+  const persistor = persistStore(store);
+
+  if (isDebuggingInChrome) {
+    // eslint-disable-next-line
+    (window as any).store = store;
+  }
+
+  // Run the main saga
+  sagaMiddleware.run(initSaga);
+
+  return { store, persistor };
+}
+
 function configureStoreAndPersistor(): { store: Store; persistor: Persistor } {
   /**
    * If available use redux-devtool version of the compose function that allow
