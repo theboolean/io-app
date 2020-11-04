@@ -3,11 +3,23 @@ import { ImageURISource } from "react-native";
 
 export type IconSource = (string & ImageURISource) | undefined;
 
+type SupportedBrands =
+  | "mastercard"
+  | "visa"
+  | "amex"
+  | "diners"
+  | "maestro"
+  | "unionpay"
+  | "discover"
+  | "jcb"
+  | "jcb15"
+  | "unknown";
+
 type CreditCardDetector = {
   blocks: Record<string, ReadonlyArray<number>>;
-  re: Record<string, RegExp>;
-  cardIcons: Record<string, IconSource>;
-  getInfo: (pan: string) => Option<string>;
+  re: Record<SupportedBrands, RegExp>;
+  cardIcons: Record<SupportedBrands, IconSource>;
+  getInfo: (pan: string) => Option<SupportedBrands>;
   getIcon: (pan: Option<string>) => IconSource;
 };
 
@@ -83,20 +95,23 @@ export const CreditCardDetector: CreditCardDetector = {
     unknown: "io-carta"
   },
 
-  getInfo: (pan: string) => {
+  getInfo: (pan: string): Option<SupportedBrands> => {
     const re = CreditCardDetector.re;
 
     // Some credit card can have up to 19 digits number.
     // Set strictMode to true will remove the 16 max-length restrain,
     // however, I never found any website validate card number like
     // this, hence probably you don't want to enable this option.
-    return fromNullable(Object.keys(re).find(k => re[k].test(pan)));
+    return fromNullable(
+      Object.keys(re).find(k =>
+        re[k as SupportedBrands].test(pan)
+      ) as SupportedBrands
+    );
   },
 
-  getIcon: (pan: Option<string>) => {
+  getIcon: (pan: Option<string>): IconSource => {
     const cardIcons = CreditCardDetector.cardIcons;
     const getInfo = CreditCardDetector.getInfo;
-
     return pan
       .chain(myPan => getInfo(myPan))
       .map(brand => cardIcons[brand])
