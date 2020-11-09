@@ -1,11 +1,22 @@
+import { debug } from "console";
 import { fromNullable } from "fp-ts/lib/Either";
 import React from "react";
+import { View, Text } from "react-native";
 import { render } from "@testing-library/react-native";
-import { PersistGate } from "redux-persist/integration/react";
-import { Provider } from "react-redux";
-import AddCardScreen from "../AddCardScreen";
-import rootSaga from "../../../sagas";
-import { configureStoreAndPersistorInjectable } from "../../../boot/configureStoreAndPersistor";
+// import { PersistGate } from "redux-persist/integration/react";
+// import { StyleProvider } from "native-base";
+// import { MenuProvider } from "react-native-popup-menu";
+// import { NavigationContainer } from '@react-navigation/native';
+// import { mockConnect } from "../../../utils/mockReduxUtils";
+import { mockReactRedux } from "mock-react-redux";
+import { withNavigation } from "react-navigation";
+import { AddCardScreen } from "../AddCardScreen";
+// import rootSaga from "../../../sagas";
+// import { configureStoreAndPersistorInjectable } from "../../../boot/configureStoreAndPersistor";
+// import theme from "../../../theme";
+// import { LightModalProvider } from "../../../components/ui/LightModal";
+// import { mockConnect } from "../../../utils/mockReduxUtils";
+// import { GlobalState } from "../../../store/reducers/types";
 
 jest.mock("react-native-background-timer", () => ({
   BackgroundTimer: { setTimeout: jest.fn },
@@ -14,6 +25,38 @@ jest.mock("react-native-background-timer", () => ({
 jest.mock("react-native-share", () => ({
   open: jest.fn()
 }));
+jest.mock("react-native-view-shot", () => jest.fn());
+jest.mock("react-native-keyboard-aware-scroll-view", () => {
+  const KeyboardAwareHOC = ({ children }: { children: any }) => children;
+  const KeyboardAwareScrollView = ({ children }: { children: any }) => children;
+
+  const listenToKeyboardEvents = jest.fn();
+  return { KeyboardAwareScrollView, KeyboardAwareHOC, listenToKeyboardEvents };
+});
+
+// Provider: ({children}) => children
+
+/*
+function renderWithRedux(component: any, initState: any) {
+  const { store, persistor } = configureStoreAndPersistorInjectable(
+    initState
+    // rootSaga
+  );
+
+  const queries = render(
+    <Provider store={store}>
+      <View accessibilityRole="tab">
+        <PersistGate persistor={persistor}>{component}</PersistGate>
+      </View>
+    </Provider>
+  );
+
+  return {
+    ...queries,
+    store
+  };
+}
+*/
 
 const initState = {
   appState: { appState: "active" },
@@ -3805,11 +3848,6 @@ const initState = {
 };
 
 it("rendersCorrectly", async () => {
-  const { store, persistor } = configureStoreAndPersistorInjectable(
-    initState,
-    rootSaga
-  );
-
   const navigation: any = {
     navigate: jest.fn(),
     state: {
@@ -3821,15 +3859,28 @@ it("rendersCorrectly", async () => {
       key: "id-1603703747027-8"
     },
     router: undefined,
-    actions: {}
+    actions: {},
+    dispatch: jest.fn()
   };
 
+  mockReactRedux().state(initState);
+
+  debug(mockReactRedux);
+  const myScreeen = () =>
+    withNavigation(
+      <AddCardScreen
+        navigation={navigation}
+        addWalletCreditCardInit={jest.fn()}
+        navigateToConfirmCardDetailsScreen={jest.fn()}
+      />
+    );
+
   const { toJSON } = render(
-    <Provider store={store}>
-      <PersistGate loading={undefined} persistor={persistor}>
-        <AddCardScreen navigation={navigation} />
-      </PersistGate>
-    </Provider>
+    <View accessibilityRole="text">
+      <Text>CIAO</Text>
+      {myScreeen}
+    </View>
   );
+
   expect(toJSON()).toMatchSnapshot();
 });

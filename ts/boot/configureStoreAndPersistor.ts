@@ -289,8 +289,8 @@ const navigation = createReactNavigationReduxMiddleware(
 const navigationHistory = createNavigationHistoryMiddleware();
 
 export function configureStoreAndPersistorInjectable(
-  initState: any,
-  initSaga: () => Generator
+  initState: any
+  // initSaga: () => Generator
 ): {
   store: Store;
   persistor: Persistor;
@@ -305,7 +305,7 @@ export function configureStoreAndPersistorInjectable(
     (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
   const middlewares = applyMiddleware(
     sagaMiddleware,
-    logger,
+    // logger,
     navigationHistory,
     navigation,
     analytics.actionTracking, // generic tracker for selected redux actions
@@ -313,17 +313,17 @@ export function configureStoreAndPersistorInjectable(
   );
   // add Reactotron enhancer if the app is running in dev mode
 
-  const enhancer: StoreEnhancer =
+  /* const enhancer: StoreEnhancer =
     RTron && RTron.createEnhancer
       ? composeEnhancers(middlewares, RTron.createEnhancer())
-      : composeEnhancers(middlewares);
+      : composeEnhancers(middlewares); */
 
   const store: Store = createStore<
     PersistedGlobalState,
     Action,
     Record<string, unknown>,
     Record<string, unknown>
-  >(persistedReducer, initState, enhancer);
+  >(persistedReducer, initState, composeEnhancers(middlewares));
   const persistor = persistStore(store);
 
   if (isDebuggingInChrome) {
@@ -332,7 +332,7 @@ export function configureStoreAndPersistorInjectable(
   }
 
   // Run the main saga
-  sagaMiddleware.run(initSaga);
+  // sagaMiddleware.run(initSaga);
 
   return { store, persistor };
 }
