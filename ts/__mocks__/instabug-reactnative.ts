@@ -14,7 +14,8 @@ const Replies = {
   setInAppNotificationsEnabled: jest.fn(),
   setOnNewReplyReceivedCallback: jest.fn(() => null),
   show: jest.fn(),
-  getUnreadRepliesCount: jest.fn(() => Promise.resolve(0))
+  getUnreadRepliesCount: jest.fn(() => Promise.resolve(0)),
+  hasChats: jest.fn((cb: (param: boolean) => void) => cb(false))
 };
 
 const Chats = {

@@ -1,22 +1,56 @@
 import { debug } from "console";
-import { fromNullable } from "fp-ts/lib/Either";
+// import { fromNullable } from "fp-ts/lib/Either";
 import React from "react";
-import { View, Text } from "react-native";
+import { View } from "react-native";
 import { render } from "@testing-library/react-native";
 // import { PersistGate } from "redux-persist/integration/react";
 // import { StyleProvider } from "native-base";
 // import { MenuProvider } from "react-native-popup-menu";
-// import { NavigationContainer } from '@react-navigation/native';
-// import { mockConnect } from "../../../utils/mockReduxUtils";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+// import { createStackNavigator } from "react-navigation";
+// import { createAppContainer } from "react-navigation";
 import { mockReactRedux } from "mock-react-redux";
-import { withNavigation } from "react-navigation";
-import { AddCardScreen } from "../AddCardScreen";
+// import WalletNavigator from "../../../navigation/WalletNavigator";
+// import { mockConnect } from "../../../utils/mockReduxUtils";
+// import { withNavigation } from "react-navigation";
+import { NavigationInjectedProps } from "react-navigation";
+import AddCardScreen from "../AddCardScreen";
+// import RootContainer from "../../../RootContainer";
 // import rootSaga from "../../../sagas";
 // import { configureStoreAndPersistorInjectable } from "../../../boot/configureStoreAndPersistor";
 // import theme from "../../../theme";
 // import { LightModalProvider } from "../../../components/ui/LightModal";
 // import { mockConnect } from "../../../utils/mockReduxUtils";
 // import { GlobalState } from "../../../store/reducers/types";
+// const testContainer = createAppContainer(WalletNavigator);
+jest.useFakeTimers();
+
+function mockWithNavigation<P extends Record<string, unknown>>(
+  Component: React.ComponentType<P>
+): React.FC<P & NavigationInjectedProps> {
+  return (props: P) => <Component navigation={jest.fn()} {...props} />;
+}
+
+jest.mock("react-navigation", () => ({
+  withNavigation: mockWithNavigation,
+  StackActions: { reset: jest.fn() },
+  NavigationActions: { navigate: jest.fn() },
+  NavigationEvents: "mockNavigationEvents"
+}));
+
+const Stack = createStackNavigator();
+const MockedNavigator = ({ component, params = {} }: any) => (
+  <NavigationContainer>
+    <Stack.Navigator>
+      <Stack.Screen
+        name="MockedScreen"
+        component={component}
+        initialParams={params}
+      />
+    </Stack.Navigator>
+  </NavigationContainer>
+);
 
 jest.mock("react-native-background-timer", () => ({
   BackgroundTimer: { setTimeout: jest.fn },
@@ -3847,8 +3881,8 @@ const initState = {
   _persist: { version: 14, rehydrated: true }
 };
 
-it("rendersCorrectly", async () => {
-  const navigation: any = {
+it("rendersCorrectly", () => {
+  /* const navigation: any = {
     navigate: jest.fn(),
     state: {
       params: {
@@ -3861,24 +3895,15 @@ it("rendersCorrectly", async () => {
     router: undefined,
     actions: {},
     dispatch: jest.fn()
-  };
+  }; */
 
   mockReactRedux().state(initState);
 
   debug(mockReactRedux);
-  const myScreeen = () =>
-    withNavigation(
-      <AddCardScreen
-        navigation={navigation}
-        addWalletCreditCardInit={jest.fn()}
-        navigateToConfirmCardDetailsScreen={jest.fn()}
-      />
-    );
 
   const { toJSON } = render(
-    <View accessibilityRole="text">
-      <Text>CIAO</Text>
-      {myScreeen}
+    <View>
+      <MockedNavigator component={AddCardScreen} />
     </View>
   );
 
