@@ -1,11 +1,12 @@
-import { debug } from "console";
 // import { fromNullable } from "fp-ts/lib/Either";
+import { debug } from "console";
 import React from "react";
 import { View } from "react-native";
 import { render } from "@testing-library/react-native";
 // import { PersistGate } from "redux-persist/integration/react";
-// import { StyleProvider } from "native-base";
-// import { MenuProvider } from "react-native-popup-menu";
+
+import { Provider } from "react-redux";
+
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 // import { createStackNavigator } from "react-navigation";
@@ -18,10 +19,8 @@ import { NavigationInjectedProps } from "react-navigation";
 import AddCardScreen from "../AddCardScreen";
 // import RootContainer from "../../../RootContainer";
 // import rootSaga from "../../../sagas";
-// import { configureStoreAndPersistorInjectable } from "../../../boot/configureStoreAndPersistor";
-// import theme from "../../../theme";
-// import { LightModalProvider } from "../../../components/ui/LightModal";
-// import { mockConnect } from "../../../utils/mockReduxUtils";
+import { configureCustomMockStore } from "../../../boot/configureStoreAndPersistor";
+
 // import { GlobalState } from "../../../store/reducers/types";
 // const testContainer = createAppContainer(WalletNavigator);
 
@@ -78,28 +77,6 @@ jest.mock("react-native-keyboard-aware-scroll-view", () => {
 });
 
 // Provider: ({children}) => children
-
-/*
-function renderWithRedux(component: any, initState: any) {
-  const { store, persistor } = configureStoreAndPersistorInjectable(
-    initState
-    // rootSaga
-  );
-
-  const queries = render(
-    <Provider store={store}>
-      <View accessibilityRole="tab">
-        <PersistGate persistor={persistor}>{component}</PersistGate>
-      </View>
-    </Provider>
-  );
-
-  return {
-    ...queries,
-    store
-  };
-}
-*/
 
 const initState = {
   // appState: { appState: "active" },
@@ -3915,6 +3892,35 @@ it("rendersCorrectly", () => {
       <MockedNavigator component={AddCardScreen} />
     </View>
   );
+
+  expect(toJSON()).toMatchSnapshot();
+});
+
+function Wrapper({ children }: any) {
+  const mockStore = configureCustomMockStore();
+  const myStore = mockStore({});
+  return <Provider store={myStore}>{children}</Provider>;
+}
+
+test("rendersCorrectlyStore", () => {
+  /* const navigation: any = {
+    navigate: jest.fn(),
+    state: {
+      params: {
+        inPayment: fromNullable(null),
+        keyFrom: "id-1603703747027-2"
+      },
+      routeName: "WALLET_ADD_CARD",
+      key: "id-1603703747027-8"
+    },
+    router: undefined,
+    actions: {},
+    dispatch: jest.fn()
+  }; */
+
+  const { toJSON } = render(<MockedNavigator component={AddCardScreen} />, {
+    wrapper: Wrapper
+  });
 
   expect(toJSON()).toMatchSnapshot();
 });
