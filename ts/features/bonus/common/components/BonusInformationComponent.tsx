@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   }
 });
 
-const loadingOpacity = 0.9;
+const loadingOpacity = 1.9;
 // for long content markdown computed height should be not enough
 const extraMarkdownBodyHeight = 20;
 /**
